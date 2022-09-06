@@ -3,6 +3,8 @@ package screen;
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextCharacter;
+import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.VirtualScreen;
 
@@ -28,20 +30,24 @@ public class ScreenHandler {
 
     public void initializeScreen() throws IOException {
         screen.startScreen();
+        TextGraphics textGraphics = screen.newTextGraphics();
+        textGraphics.setForegroundColor(TextColor.ANSI.RED);
+        textGraphics.setBackgroundColor(TextColor.ANSI.GREEN);
+        textGraphics.putString(5, 0, "Press Escape to exit");
     }
 
     public void refreshScreen(Boolean[][] gameState) throws IOException {
         // First needs to write to screen
-            writeToScreen(gameState);
+        writeToScreen(gameState);
 
         // Updates the screen contents
         screen.refresh();
     }
 
     private void writeToScreen(Boolean[][] gameState) {
-        for (int row = 0; row < gameState.length; row++) {
-            for (int column = 0; row < gameState[0].length; row++) {
-                screen.setCharacter(row, column, TextCharacter.fromCharacter('A')[0]);
+        for (int column = 0; column < gameState.length; column++) {
+            for (int row = 0; row < gameState[0].length; row++) {
+                screen.setCharacter(column, row + 1, (gameState[column][row]) ? TextCharacter.fromCharacter('A')[0] : TextCharacter.DEFAULT_CHARACTER);
             }
         }
     }
@@ -55,6 +61,6 @@ public class ScreenHandler {
     }
 
     public void setMinSize(int rows, int columns) {
-        screen.setMinimumSize(new TerminalSize(rows, columns));
+        screen.setMinimumSize(new TerminalSize(columns, rows));
     }
 }

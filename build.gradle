@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'application'
 }
 
 group 'org.example'
@@ -19,4 +20,17 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+task propertyTypes(){
+    doLast{
+        if (project.hasProperty("args")) {
+            println "Our input argument with project property ["+project.getProperty("args")+"]"
+        }
+        println "Our input argument with system property ["+System.getProperty("args")+"]"
+    }
+}
+
+application {
+    mainClassName = 'App'
 }

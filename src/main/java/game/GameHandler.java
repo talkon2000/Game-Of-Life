@@ -1,14 +1,19 @@
 package game;
 
+import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import screen.ScreenHandler;
 
+import javax.inject.Inject;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class GameHandler {
 
     ScreenHandler screenHandler;
 
+    @Inject
     public GameHandler(ScreenHandler screenHandler) {
         this.screenHandler = screenHandler;
     }
@@ -18,19 +23,21 @@ public class GameHandler {
      * @param gameState 2-dimensional array representing the game board
      */
     public void doGame(Boolean[][] gameState) {
-        screenHandler.setMinSize(gameState.length, gameState[0].length);
+        screenHandler.setMinSize(gameState[0].length + 1, gameState.length);
 
         while (true) {
+            gameState = doTick(gameState);
+
             try {
                 screenHandler.refreshScreen(gameState);
-                if (screenHandler.pollInput().getKeyType().equals(KeyType.Escape)) {
+                KeyStroke input = screenHandler.pollInput();
+                if (input != null && input.getKeyType().equals(KeyType.Escape)) {
                     break;
                 }
             } catch (IOException e) {
                 e.printStackTrace();
                 return;
             }
-            gameState = doTick(gameState);
         }
     }
 
@@ -44,19 +51,20 @@ public class GameHandler {
     private Boolean[][] doTick(Boolean[][] initialGameState) {
         doTickDelay();
 
-        Boolean[][] newGameState = initialGameState.clone();
-        for (int row = 0; row < initialGameState.length; row++) {
-            for (int column = 0; column < initialGameState[0].length; column++) {
-                int aliveNeighbors = checkNeighbors(initialGameState, row, column);
+        Boolean[][] newGameState = new Boolean[initialGameState.length][initialGameState[0].length];
+        for (int column = 0; column < initialGameState.length; column++) {
+            for (int row = 0; row < initialGameState[0].length; row++) {
+                int aliveNeighbors = checkNeighbors(initialGameState, column, row);
+                Boolean cellState = initialGameState[column][row];
 
-                Boolean cellState = initialGameState[row][column];
                 // If cell is dead and has 3 live neighbors, it populates
-                if (!cellState && aliveNeighbors == 3) {
-                    newGameState[row][column] = true;
+                // If cell is dead and previous condition is not met, it should stay dead
+                if (!cellState) {
+                    newGameState[column][row] = (aliveNeighbors == 3);
                 }
                 // If cell is alive and has fewer than 2 or greater than 3 live neighbors, it dies
-                else if (cellState && (aliveNeighbors < 2 || aliveNeighbors > 3)) {
-                    newGameState[row][column] = false;
+                else {
+                    newGameState[column][row] = !(aliveNeighbors < 2 || aliveNeighbors > 3);
                 }
             }
         }
@@ -64,13 +72,16 @@ public class GameHandler {
         return newGameState;
     }
 
-    private int checkNeighbors(Boolean[][] gameState, int row, int column) {
+    private int checkNeighbors(Boolean[][] gameState, int column, int row) {
         int neighborCount = 0;
         // Check all neighbors 1 cell away
         for (int x = -1; x < 2; x++) {
             for (int y = -1; y < 2; y++) {
+                if (x == 0 && y ==0) {
+                    continue;
+                }
                 try {
-                    if (gameState[row + x][column + y]) {
+                    if (gameState[column + x][row + y]) {
                         neighborCount++;
                     }
                 } catch (IndexOutOfBoundsException ignored) {}

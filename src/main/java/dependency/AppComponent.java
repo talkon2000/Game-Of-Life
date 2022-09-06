@@ -1,4 +1,3 @@
-/*
 package dependency;
 
 import dagger.Component;
@@ -12,4 +11,3 @@ public interface AppComponent {
 
     public GameHandler provideGameHandler();
 }
-*/

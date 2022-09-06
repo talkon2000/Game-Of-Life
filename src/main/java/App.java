@@ -1,6 +1,8 @@
 import com.googlecode.lanterna.screen.VirtualScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 //import dependency.AppComponent;
+import dependency.AppComponent;
+import dependency.DaggerAppComponent;
 import game.GameHandler;
 import screen.ScreenHandler;
 
@@ -33,15 +35,9 @@ public class App {
         }
 
         // Create GameHandler and dependencies
-        /*AppComponent dagger = DaggerAppComponent.create();
-        gameHandler = dagger.provideGameHandler();*/
+        AppComponent dagger = DaggerAppComponent.create();
+        gameHandler = dagger.provideGameHandler();
 
-        try {
-            gameHandler = new GameHandler(new ScreenHandler(new VirtualScreen(new DefaultTerminalFactory().createScreen())));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
 
         // Populate game field randomly
         Boolean[][] gameState = new Boolean[size[0]][size[1]];
