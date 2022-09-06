@@ -6,8 +6,6 @@ import screen.ScreenHandler;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class GameHandler {
 
