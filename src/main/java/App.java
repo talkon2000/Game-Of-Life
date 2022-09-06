@@ -1,10 +1,6 @@
-import com.googlecode.lanterna.screen.VirtualScreen;
-import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
-//import dependency.AppComponent;
 import dependency.AppComponent;
 import dependency.DaggerAppComponent;
 import game.GameHandler;
-import screen.ScreenHandler;
 
 import java.io.IOException;
 import java.util.Random;
